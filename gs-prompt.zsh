@@ -1,6 +1,6 @@
-# pika prompt
+# gs prompt
 # Author: LeoMao
-# https://github.com/leomao/pika-prompt
+# https://github.com/leomao/gs-prompt
 # Modified from pure: https://github.com/sindresorhus/pure
 # MIT License
 
@@ -45,7 +45,7 @@
 # turns seconds into human readable time
 # 165392 => 1d 21h 56m 32s
 # https://github.com/sindresorhus/pretty-time-zsh
-prompt_pika_human_time_to_var() {
+prompt_gs_human_time_to_var() {
 	local human=" " total_seconds=$1 var=$2
 	local days=$(( total_seconds / 60 / 60 / 24 ))
 	local hours=$(( total_seconds / 60 / 60 % 24 ))
@@ -60,30 +60,30 @@ prompt_pika_human_time_to_var() {
 	typeset -g "${var}"="${human}"
 }
 
-# stores (into prompt_pika_cmd_exec_time) the exec time of the last command if set threshold was exceeded
-prompt_pika_check_cmd_exec_time() {
+# stores (into prompt_gs_cmd_exec_time) the exec time of the last command if set threshold was exceeded
+prompt_gs_check_cmd_exec_time() {
 	integer elapsed
-	(( elapsed = EPOCHSECONDS - ${prompt_pika_cmd_timestamp:-$EPOCHSECONDS} ))
-	prompt_pika_cmd_exec_time=
-	(( elapsed > ${PIKA_CMD_MAX_EXEC_TIME:=5} )) && {
-		prompt_pika_human_time_to_var $elapsed "prompt_pika_cmd_exec_time"
+	(( elapsed = EPOCHSECONDS - ${prompt_gs_cmd_timestamp:-$EPOCHSECONDS} ))
+	prompt_gs_cmd_exec_time=
+	(( elapsed > ${GS_CMD_MAX_EXEC_TIME:=5} )) && {
+		prompt_gs_human_time_to_var $elapsed "prompt_gs_cmd_exec_time"
 	}
 }
 
-prompt_pika_clear_screen() {
+prompt_gs_clear_screen() {
 	# enable output to terminal
 	zle -I
 	# clear screen and move cursor to (0, 0)
 	print -n '\e[2J\e[0;0H'
 	# print preprompt
-	prompt_pika_render_preprompt precmd
+	prompt_gs_render_preprompt precmd
 }
 
-prompt_pika_check_git_arrows() {
+prompt_gs_check_git_arrows() {
 	# reset git arrows
-	prompt_pika_git_arrows=
+	prompt_gs_git_arrows=
 
-	[[ -n $prompt_pika_current_working_tree ]] || return
+	[[ -n $prompt_gs_current_working_tree ]] || return
 
 	# check if there is an upstream configured for this branch
 	command git rev-parse --abbrev-ref @'{u}' &>/dev/null || return
@@ -98,17 +98,17 @@ prompt_pika_check_git_arrows() {
 	arrow_status=(${(ps:\t:)arrow_status})
 	local arrows left=${arrow_status[1]} right=${arrow_status[2]}
 
-	(( ${right:-0} > 0 )) && arrows+="${PIKA_GIT_DOWN_ARROW:-⇣}"
-	(( ${left:-0} > 0 )) && arrows+="${PIKA_GIT_UP_ARROW:-⇡}"
+	(( ${right:-0} > 0 )) && arrows+="${GS_GIT_DOWN_ARROW:-⇣}"
+	(( ${left:-0} > 0 )) && arrows+="${GS_GIT_UP_ARROW:-⇡}"
 
-	[[ -n $arrows ]] && prompt_pika_git_arrows=" ${arrows}"
+	[[ -n $arrows ]] && prompt_gs_git_arrows=" ${arrows}"
 
-	if (( ${prompt_pika_git_fetching} )); then
-		prompt_pika_git_arrows+=" ${PIKA_GIT_FETCHING_SYMBOL:-↻ }"
+	if (( ${prompt_gs_git_fetching} )); then
+		prompt_gs_git_arrows+=" ${GS_GIT_FETCHING_SYMBOL:-↻ }"
 	fi
 }
 
-prompt_pika_set_title() {
+prompt_gs_set_title() {
 	# tell the terminal we are setting the title
 	print -n '\e]0;'
 	# show hostname if connected through ssh
@@ -123,15 +123,15 @@ prompt_pika_set_title() {
 	print -n '\a'
 }
 
-prompt_pika_preexec() {
-	prompt_pika_cmd_timestamp=$EPOCHSECONDS
+prompt_gs_preexec() {
+	prompt_gs_cmd_timestamp=$EPOCHSECONDS
 
 	# shows the current dir and executed command in the title while a process is active
-	prompt_pika_set_title 'ignore-escape' "$PWD:t: $2"
+	prompt_gs_set_title 'ignore-escape' "$PWD:t: $2"
 }
 
 # string length ignoring ansi escapes
-prompt_pika_string_length_to_var() {
+prompt_gs_string_length_to_var() {
 	local str=$1 var=$2 length
 	# perform expansion on str and check length
 	length=$(( ${#${(S%%)str//(\%([KF1]|)\{*\}|\%[Bbkf])}} ))
@@ -140,9 +140,9 @@ prompt_pika_string_length_to_var() {
 	typeset -g "${var}"="${length}"
 }
 
-prompt_pika_truncate_pwd() {
+prompt_gs_truncate_pwd() {
 	# n = number of directories to show in full (n = 3, /a/b/c/dee/ee/eff)
-	n=${PIKA_TRUNCATE_PWD_NUM:-4}
+	n=${GS_TRUNCATE_PWD_NUM:-4}
 	path=$(pwd | sed -e "s,^$HOME,~,")
 
 	# split our path on /
@@ -168,9 +168,9 @@ prompt_pika_truncate_pwd() {
 	echo ${(j:/:)dirs}
 }
 
-prompt_pika_update_preprompt() {
+prompt_gs_update_preprompt() {
 	# only redraw if the expanded preprompt has changed
-	[[ "${prompt_pika_last_preprompt[2]}" != "${(S%%)preprompt}" ]] || return
+	[[ "${prompt_gs_last_preprompt[2]}" != "${(S%%)preprompt}" ]] || return
 
 	# store the current prompt_subst setting so that it can be restored later
 	local prompt_subst_status=$options[prompt_subst]
@@ -180,14 +180,14 @@ prompt_pika_update_preprompt() {
 
 	# calculate length of preprompt and store it locally in preprompt_length
 	integer preprompt_length lines
-	prompt_pika_string_length_to_var "${preprompt}" "preprompt_length"
+	prompt_gs_string_length_to_var "${preprompt}" "preprompt_length"
 
 	# calculate number of preprompt lines for redraw purposes
 	(( lines = ( preprompt_length - 1 ) / COLUMNS + 1 ))
 
 	# calculate previous preprompt lines to figure out how the new preprompt should behave
 	integer last_preprompt_length last_lines
-	prompt_pika_string_length_to_var "${prompt_pika_last_preprompt[1]}" "last_preprompt_length"
+	prompt_gs_string_length_to_var "${prompt_gs_last_preprompt[1]}" "last_preprompt_length"
 	(( last_lines = ( last_preprompt_length - 1 ) / COLUMNS + 1 ))
 
 	# clr_prev_preprompt erases visual artifacts from previous preprompt
@@ -222,56 +222,56 @@ prompt_pika_update_preprompt() {
 	fi
 }
 
-prompt_pika_render_preprompt() {
+prompt_gs_render_preprompt() {
 
 	# check that no command is currently running, the preprompt will otherwise be rendered in the wrong place
-  #[[ -n ${prompt_pika_cmd_timestamp+x} && "$1" != "precmd" ]] && return
+  #[[ -n ${prompt_gs_cmd_timestamp+x} && "$1" != "precmd" ]] && return
 
 	# construct preprompt
 	preprompt=""
 	[[ -n $VIRTUAL_ENV ]] && preprompt+="%F{$PROMPT_COLOR_VENV}($(basename $VIRTUAL_ENV)) %f"
-	preprompt+="%F{$PROMPT_COLOR_PWD}$(prompt_pika_truncate_pwd)%f"
+	preprompt+="%F{$PROMPT_COLOR_PWD}$(prompt_gs_truncate_pwd)%f"
 	# git info
   preprompt+="%F{$PROMPT_COLOR_GIT}${vcs_info_msg_0_}%f"
-  preprompt+="%F{$PROMPT_COLOR_GIT_DIRTY}${prompt_pika_git_dirty}${prompt_pika_git_dirty_checking}%f"
+  preprompt+="%F{$PROMPT_COLOR_GIT_DIRTY}${prompt_gs_git_dirty}${prompt_gs_git_dirty_checking}%f"
 	# git pull/push arrows
-	preprompt+="%F{$PROMPT_COLOR_GIT_ARROW}${prompt_pika_git_arrows}%f"
+	preprompt+="%F{$PROMPT_COLOR_GIT_ARROW}${prompt_gs_git_arrows}%f"
 	# username and machine if applicable
-	preprompt+=$prompt_pika_username
+	preprompt+=$prompt_gs_username
 	# execution time
-	preprompt+="%F{$PROMPT_COLOR_EXECTIME}${prompt_pika_cmd_exec_time}%f"
+	preprompt+="%F{$PROMPT_COLOR_EXECTIME}${prompt_gs_cmd_exec_time}%f"
 
 	# perform fancy terminal editing only for update
 	if [[ "$1" == "precmd" ]]; then
 		print -P "\n${preprompt}"
 	else
-		prompt_pika_update_preprompt
+		prompt_gs_update_preprompt
 		zle && zle .reset-prompt
 	fi
 
 	# store previous preprompt for comparison
-	prompt_pika_last_preprompt=${(S%%)preprompt}
+	prompt_gs_last_preprompt=${(S%%)preprompt}
 }
 
-prompt_pika_precmd() {
+prompt_gs_precmd() {
 	# check exec time and store it in a variable
-	prompt_pika_check_cmd_exec_time
+	prompt_gs_check_cmd_exec_time
 
 	# shows the full path in the title
-	prompt_pika_set_title 'expand-prompt' '%~'
+	prompt_gs_set_title 'expand-prompt' '%~'
 
 	# get vcs info
   vcs_info
 
 	# preform async git dirty check and fetch
-	prompt_pika_async_tasks
+	prompt_gs_async_tasks
 
 	# update the prompt
-	prompt_pika_render_preprompt precmd
+	prompt_gs_render_preprompt precmd
 }
 
 # fastest possible way to check if repo is dirty
-prompt_pika_async_git_dirty() {
+prompt_gs_async_git_dirty() {
 	setopt localoptions noshwordsplit
 	local untracked_dirty=$1; dir=$2
 
@@ -284,10 +284,10 @@ prompt_pika_async_git_dirty() {
 		test -z "$(command git status --porcelain --ignore-submodules -unormal)"
 	fi
 
-	(( $? )) && echo ${PIKA_GIT_DIRTY:-"±"}
+	(( $? )) && echo ${GS_GIT_DIRTY:-"±"}
 }
 
-prompt_pika_async_git_fetch() {
+prompt_gs_async_git_fetch() {
 	setopt localoptions noshwordsplit
 	# use cd -q to avoid side effects of changing directory, e.g. chpwd hooks
 	builtin cd -q $1
@@ -296,74 +296,74 @@ prompt_pika_async_git_fetch() {
 	SSH_ASKPASS=0 GIT_TERMINAL_PROMPT=0 command git -c gc.auto=0 fetch &> /dev/null
 }
 
-prompt_pika_async_tasks() {
+prompt_gs_async_tasks() {
 	# initialize async worker
-	if ((!${prompt_pika_async_init:-0})); then
-		async_start_worker "prompt_pika" -u -n
-		async_register_callback "prompt_pika" prompt_pika_async_callback
-		prompt_pika_async_init=1
+	if ((!${prompt_gs_async_init:-0})); then
+		async_start_worker "prompt_gs" -u -n
+		async_register_callback "prompt_gs" prompt_gs_async_callback
+		prompt_gs_async_init=1
 	fi
 
 	# store working_tree without the "x" prefix
 	local working_tree="${vcs_info_msg_1_#x}"
 
-	# check if the working tree changed (prompt_pika_current_working_tree is prefixed by "x")
-	if [[ ${prompt_pika_current_working_tree#x} != $working_tree ]]; then
+	# check if the working tree changed (prompt_gs_current_working_tree is prefixed by "x")
+	if [[ ${prompt_gs_current_working_tree#x} != $working_tree ]]; then
 		# stop any running async jobs
-		async_flush_jobs "prompt_pika"
+		async_flush_jobs "prompt_gs"
 
 		# reset git preprompt variables, switching working tree
-		unset prompt_pika_git_dirty
-		unset prompt_pika_git_dirty_checking
-		unset prompt_pika_git_fetching
+		unset prompt_gs_git_dirty
+		unset prompt_gs_git_dirty_checking
+		unset prompt_gs_git_fetching
 
 		# set the new working tree and prefix with "x" to prevent the creation of a named path by AUTO_NAME_DIRS
-		prompt_pika_current_working_tree="x${working_tree}"
+		prompt_gs_current_working_tree="x${working_tree}"
 
 		# do not preform git fetch if it is disabled or working_tree == HOME
-		if (( ${PIKA_GIT_FETCH:-1} )) && [[ -n $working_tree ]]; then
+		if (( ${GS_GIT_FETCH:-1} )) && [[ -n $working_tree ]]; then
 			# tell worker to do a git fetch
-			prompt_pika_git_fetching=1
-			async_job "prompt_pika" prompt_pika_async_git_fetch "${working_tree}"
+			prompt_gs_git_fetching=1
+			async_job "prompt_gs" prompt_gs_async_git_fetch "${working_tree}"
 		fi
 	fi
 
-	prompt_pika_check_git_arrows
+	prompt_gs_check_git_arrows
 
 	# only perform tasks inside git working tree
 	[[ -n $working_tree ]] || return
 
-  if ! [[ -n ${prompt_pika_git_dirty_checking} ]]; then
-    prompt_pika_git_dirty_checking="?"
-    async_job "prompt_pika" prompt_pika_async_git_dirty "${PIKA_GIT_UNTRACKED_DIRTY:-1}" "${working_tree}"
+  if ! [[ -n ${prompt_gs_git_dirty_checking} ]]; then
+    prompt_gs_git_dirty_checking="?"
+    async_job "prompt_gs" prompt_gs_async_git_dirty "${GS_GIT_UNTRACKED_DIRTY:-1}" "${working_tree}"
   fi
 }
 
-prompt_pika_async_callback() {
+prompt_gs_async_callback() {
 	local job=$1
 	local output=$3
 	local exec_time=$4
 
 	case "${job}" in
-		prompt_pika_async_git_dirty)
-			unset prompt_pika_git_dirty_checking
-			prompt_pika_git_dirty=$output
-			prompt_pika_render_preprompt
+		prompt_gs_async_git_dirty)
+			unset prompt_gs_git_dirty_checking
+			prompt_gs_git_dirty=$output
+			prompt_gs_render_preprompt
 			;;
-		prompt_pika_async_git_fetch)
-			unset prompt_pika_git_fetching
-			prompt_pika_check_git_arrows
-			prompt_pika_render_preprompt
+		prompt_gs_async_git_fetch)
+			unset prompt_gs_git_fetching
+			prompt_gs_check_git_arrows
+			prompt_gs_render_preprompt
 			;;
 	esac
 }
 
-prompt_pika_setup_prompt() {
+prompt_gs_setup_prompt() {
 	# prompt turns red if the previous command didn't exit with 0
-  PROMPT="$prompt_mode%(?.%F{$PROMPT_COLOR_SYMBOL}.%F{$PROMPT_COLOR_SYMBOL_E})${PIKA_PROMPT_SYMBOL:-❯}%f "
+  PROMPT="$prompt_mode%(?.%F{$PROMPT_COLOR_SYMBOL}.%F{$PROMPT_COLOR_SYMBOL_E})${GS_PROMPT_SYMBOL:-❯}%f "
 }
 
-prompt_pika_setup() {
+prompt_gs_setup() {
 	setopt promptpercent
 
 	zmodload zsh/datetime
@@ -374,8 +374,8 @@ prompt_pika_setup() {
 	autoload -Uz vcs_info
 	autoload -Uz async && async
 
-	add-zsh-hook precmd prompt_pika_precmd
-	add-zsh-hook preexec prompt_pika_preexec
+	add-zsh-hook precmd prompt_gs_precmd
+	add-zsh-hook preexec prompt_gs_preexec
 
 	zstyle ':vcs_info:*' enable git
 	zstyle ':vcs_info:*' use-simple true
@@ -390,20 +390,20 @@ prompt_pika_setup() {
 	# override the builtin one so that the preprompt is displayed correctly when
 	# ^L is issued.
 	if [[ $widgets[clear-screen] == 'builtin' ]]; then
-		zle -N clear-screen prompt_pika_clear_screen
+		zle -N clear-screen prompt_gs_clear_screen
 	fi
 
 	# show username@host if logged in through SSH
 	if [[ "$SSH_CONNECTION" != '' ]]; then
-		prompt_pika_username=" %F{$PROMPT_COLOR_USER}%n%f"
-		prompt_pika_username+="%F{$PROMPT_COLOR_AT}@%f"
-		prompt_pika_username+="%F{$PROMPT_COLOR_HOST}%m%f"
+		prompt_gs_username=" %F{$PROMPT_COLOR_USER}%n%f"
+		prompt_gs_username+="%F{$PROMPT_COLOR_AT}@%f"
+		prompt_gs_username+="%F{$PROMPT_COLOR_HOST}%m%f"
 	fi
 
 	# show username@host if root, with username in white
-	[[ $UID -eq 0 ]] && prompt_pika_username=' %F{white}%n%f%F{242}@%m%f'
+	[[ $UID -eq 0 ]] && prompt_gs_username=' %F{white}%n%f%F{242}@%m%f'
 
-	prompt_pika_setup_prompt
+	prompt_gs_setup_prompt
 	if (( $+functions[add-vi-mode-hook] )); then
 		vi-mode-info() {
 			case $1 in
@@ -420,7 +420,7 @@ prompt_pika_setup() {
 					prompt_mode="%B%F{$PROMPT_COLOR_VIMREP} R %f%b"
 					;;
 			esac
-			prompt_pika_setup_prompt
+			prompt_gs_setup_prompt
 			zle .reset-prompt
 		}
 		zle -N vi-mode-info
@@ -429,12 +429,12 @@ prompt_pika_setup() {
 
 	# register custom reset-prompt
 	reset-prompt() {
-		prompt_pika_render_preprompt
+		prompt_gs_render_preprompt
 		zle .reset-prompt
 	}
 	zle -N reset-prompt
 }
 
-prompt_pika_setup "$@"
+prompt_gs_setup "$@"
 
 # vim: set noet:
