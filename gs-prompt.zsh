@@ -1,7 +1,7 @@
 # gs prompt
-# Author: LeoMao
-# https://github.com/leomao/gs-prompt
-# Modified from pure: https://github.com/sindresorhus/pure
+# Author: Gary Shih
+# https://github.com/gantheory/gs-prompt
+# Modified from https://github.com/leomao/pika-prompt
 # MIT License
 
 # For my own and others sanity
@@ -35,7 +35,8 @@
 [[ -z "${PROMPT_COLOR_ROOT}" ]] && PROMPT_COLOR_ROOT=white
 [[ -z "${PROMPT_COLOR_AT}" ]] && PROMPT_COLOR_AT=242
 [[ -z "${PROMPT_COLOR_HOST}" ]] && PROMPT_COLOR_HOST=242
-[[ -z "${PROMPT_COLOR_SYMBOL}" ]] && PROMPT_COLOR_SYMBOL=magenta
+# [[ -z "${PROMPT_COLOR_SYMBOL}" ]] && PROMPT_COLOR_SYMBOL=magenta
+[[ -z "${PROMPT_COLOR_SYMBOL}" ]] && PROMPT_COLOR_SYMBOL=119
 [[ -z "${PROMPT_COLOR_SYMBOL_E}" ]] && PROMPT_COLOR_SYMBOL_E=red
 [[ -z "${PROMPT_COLOR_VIMCMD}" ]] && PROMPT_COLOR_VIMCMD=69
 [[ -z "${PROMPT_COLOR_VIMVIS}" ]] && PROMPT_COLOR_VIMVIS=214
