@@ -26,7 +26,8 @@
 
 # default color settings
 [[ -z "${PROMPT_COLOR_VENV}" ]] && PROMPT_COLOR_VENV=87
-[[ -z "${PROMPT_COLOR_PWD}" ]] && PROMPT_COLOR_PWD=blue
+# [[ -z "${PROMPT_COLOR_PWD}" ]] && PROMPT_COLOR_PWD=blue
+[[ -z "${PROMPT_COLOR_PWD}" ]] && PROMPT_COLOR_PWD=cyan
 [[ -z "${PROMPT_COLOR_GIT}" ]] && PROMPT_COLOR_GIT=242
 [[ -z "${PROMPT_COLOR_GIT_DIRTY}" ]] && PROMPT_COLOR_GIT_DIRTY=red
 [[ -z "${PROMPT_COLOR_GIT_ARROW}" ]] && PROMPT_COLOR_GIT_ARROW=cyan
