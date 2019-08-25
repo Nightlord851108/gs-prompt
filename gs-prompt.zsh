@@ -37,6 +37,7 @@
 [[ -z "${PROMPT_COLOR_HOST}" ]] && PROMPT_COLOR_HOST=242
 [[ -z "${PROMPT_COLOR_SYMBOL}" ]] && PROMPT_COLOR_SYMBOL=244
 [[ -z "${PROMPT_COLOR_SYMBOL_E}" ]] && PROMPT_COLOR_SYMBOL_E=red
+[[ -z "${PROMPT_COLOR_TIME}" ]] && PROMPT_COLOR_TIME=96
 #[[ -z "${PROMPT_COLOR_VIMCMD}" ]] && PROMPT_COLOR_VIMCMD=69
 #[[ -z "${PROMPT_COLOR_VIMVIS}" ]] && PROMPT_COLOR_VIMVIS=214
 #[[ -z "${PROMPT_COLOR_VIMREP}" ]] && PROMPT_COLOR_VIMREP=203
@@ -364,7 +365,7 @@ prompt_gs_async_callback() {
 
 prompt_gs_setup_prompt() {
 	# prompt turns red if the previous command didn't exit with 0
-  PROMPT="$prompt_mode%(?.%F{$PROMPT_COLOR_SYMBOL}.%F{$PROMPT_COLOR_SYMBOL_E})${GS_PROMPT_SYMBOL:-❯}%f "
+  PROMPT="%(?.%F{$PROMPT_COLOR_TIME}%T %f$prompt_mode%(?.%F{$PROMPT_COLOR_SYMBOL}.%F{$PROMPT_COLOR_SYMBOL_E})${GS_PROMPT_SYMBOL:-❯}%f "
 }
 
 prompt_gs_setup() {

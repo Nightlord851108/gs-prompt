@@ -1,2 +1,2 @@
-# gs-prompt
-This is modified from [pika-prompt](https://github.com/leomao/pika-prompt)
+# yh-prompt
+This is modified from [gs-prompt](https://github.com/gantheory/gs-prompt)
