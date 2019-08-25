@@ -235,7 +235,7 @@ prompt_gs_render_preprompt() {
 	# construct preprompt
 	preprompt=""
 	[[ -n $VIRTUAL_ENV ]] && preprompt+="%F{$PROMPT_COLOR_VENV}($(basename $VIRTUAL_ENV)) %f"
-	preprompt+="%F{$PROMPT_COLOR_PWD}$(prompt_gs_truncate_pwd)%f"
+	preprompt+="%F{$PROMPT_COLOR_PWD}%n@$(prompt_gs_truncate_pwd)%f"
 	# git info
   preprompt+="%F{$PROMPT_COLOR_GIT}${vcs_info_msg_0_}%f"
   preprompt+="%F{$PROMPT_COLOR_GIT_DIRTY}${prompt_gs_git_dirty}${prompt_gs_git_dirty_checking}%f"
