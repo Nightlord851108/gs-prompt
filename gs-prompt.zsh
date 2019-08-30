@@ -147,15 +147,19 @@ prompt_gs_string_length_to_var() {
 
 prompt_gs_truncate_pwd() {
 	# n = number of directories to show in full (n = 3, /a/b/c/dee/ee/eff)
+	local n
 	n=${GS_TRUNCATE_PWD_NUM:-4}
 	path=$(pwd | sed -e "s,^$HOME,~,")
 
 	# split our path on /
+	local dirs
 	dirs=("${(s:/:)path}")
+	local dirs_length
 	dirs_length=$#dirs
 
 	if [[ $dirs_length -ge $n ]]; then
 		# we have more dirs than we want to show in full, so compact those down
+		local max
 		((max=dirs_length - n))
 		for (( i = 1; i <= $max; i++ )); do
 			step="$dirs[$i]"
