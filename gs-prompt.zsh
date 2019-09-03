@@ -368,9 +368,7 @@ prompt_gs_async_callback() {
 }
 
 prompt_gs_setup_prompt() {
-	setopt PROMPT_SUBST
 	PROMPT="%B%F{079}%T%f%b"
-	TMOUT=1
 	# prompt turns red if the previous command didn't exit with 0
 	PROMPT+="$prompt_mode%(?.%F{$PROMPT_COLOR_SYMBOL}.%F{$PROMPT_COLOR_SYMBOL_E})${GS_PROMPT_SYMBOL:-❯}%f "
 }
